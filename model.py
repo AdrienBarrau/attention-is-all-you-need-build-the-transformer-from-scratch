@@ -1009,8 +1009,24 @@ def compute_candidate_scores(beam_scores, next_token_log_probs):
 
     return torch.tensor(res)
 
-# Step 77 - select_top_k_candidates (not yet solved)
-# TODO: implement
+# Step 77 - select_top_k_candidates
+import torch
+
+def select_top_k_candidates(candidate_scores, k):
+    # TODO: pick the top k (beam_index, token_id, score) triples from candidate_scores
+    vocab_size = candidate_scores.shape[1]
+    flat_scores = candidate_scores.view(-1)
+    
+    topk_scores, topk_flat_indices = torch.topk(flat_scores, k, dim=-1, largest=True, sorted=True)
+    
+    beam_indices = torch.div(topk_flat_indices, vocab_size, rounding_mode='floor')
+    token_ids = topk_flat_indices % vocab_size
+    
+    return {
+        'beam_indices': beam_indices,  
+        'token_ids': token_ids,        
+        'scores': topk_scores
+    }
 
 # Step 78 - append_tokens_to_beam_sequences (not yet solved)
 # TODO: implement
