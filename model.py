@@ -1053,6 +1053,18 @@ def mark_finished_beams(token_ids, finished_flags, end_token_id):
     
     return updated_finished_flags
 
-# Step 80 - select_best_finished_beam (not yet solved)
-# TODO: implement
+# Step 80 - select_best_finished_beam
+def select_best_finished_beam(finished_sequences, finished_scores, alpha):
+    # TODO: return the finished beam with the highest length-penalized score
+    lengths = torch.tensor([seq.shape[0] for seq in finished_sequences], dtype=torch.float32)
+    penalty = [compute_length_penalty(lengths[i], alpha) for i in range (len(lengths))]
+    penalized_scores = torch.tensor([finished_scores[i] / penalty[i] for i in range (len(finished_scores))])
+    
+   
+    best_index = torch.argmax(penalized_scores)
+    
+    return {
+        'sequence': finished_sequences[best_index],
+        'score': penalized_scores[best_index].item()
+    }
 
